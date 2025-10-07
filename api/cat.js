@@ -1,30 +1,29 @@
 import OpenAI from "openai";
-import fetch from "node-fetch";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
 
 export default async function handler(req, res) {
   try {
-    // ?? ”L‚Ì‰æ‘œæ“¾
-    const catRes = await fetch("https://api.thecatapi.com/v1/images/search");
-    const catData = await catRes.json();
-    const imageUrl = catData[0].url;
+    // The Cat APIã‹ã‚‰ç”»åƒã‚’å–å¾—
+    const imageRes = await fetch("https://api.thecatapi.com/v1/images/search");
+    const imageData = await imageRes.json();
+    const catImage = imageData[0]?.url;
 
-    // ?? ”L“¤’m¯¶¬i“ú–{Œêj
-    const factRes = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "‚ ‚È‚½‚Í”L‚Ìê–å‰Æ‚Å‚·B’Z‚­‚Ä‚©‚í‚¢‚¢“ú–{Œê‚Ì”L“¤’m¯‚ğ1‚Â‹³‚¦‚Ä‚­‚¾‚³‚¢B" }
-      ]
+    // OpenAIã§æ—¥æœ¬èªã®çŒ«è±†çŸ¥è­˜ã‚’ç”Ÿæˆ
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const fact = factRes.choices[0].message.content.trim();
+    const prompt = "çŒ«ã«é–¢ã™ã‚‹é¢ç™½ã„è±†çŸ¥è­˜ã‚’æ—¥æœ¬èªã§1ã¤æ•™ãˆã¦ãã ã•ã„ã€‚";
 
-    res.status(200).json({ image: imageUrl, fact });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const fact = completion.choices[0].message.content.trim();
+
+    res.status(200).json({ image: catImage, fact });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½" });
+    console.error("Error:", error);
+    res.status(500).json({ error: "ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ" });
   }
 }
