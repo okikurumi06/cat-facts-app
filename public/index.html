@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff8fc;
+    color: #444;
+    text-align: center;
+    padding: 40px;
+  }
+  h1 {
+    color: #ff7eb9;
+    font-size: 2.4em;
+  }
+  button {
+    background: #ffb6c1;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #ff99aa;
+  }
+  .fact-box {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 3px 10px rgba(255, 182, 193, 0.3);
+  }
+</style>
+
+  <meta charset="UTF-8">
+  <title>🐾 ねこ豆知識メーカー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>🐱 ねこ豆知識メーカー</h1>
+    <div class="card">
+      <img id="catImage" src="" alt="猫の画像">
+      <p id="catFact">読み込み中...</p>
+      <button id="refreshBtn">🐾 もう1回！</button>
+    </div>
+  </main>
+
+  <script>
+    async function fetchCat() {
+      const res = await fetch("/api/cat");
+      const data = await res.json();
+      document.getElementById("catImage").src = data.image;
+      document.getElementById("catFact").textContent = data.fact;
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", fetchCat);
+    fetchCat(); // ページ読み込み時に自動表示
+  </script>
+</body>
+</html>
