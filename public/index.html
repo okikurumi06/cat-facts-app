@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>毎日にゃんこ everyday cat 🐾</title>
 
-    <!-- ✅ OGP設定（XなどのSNSプレビュー用） -->
+    <!-- ✅ OGP設定 -->
     <meta property="og:title" content="毎日にゃんこ everyday cat 🐾" />
     <meta property="og:description" content="毎日、ちょっと幸せになる猫の豆知識をお届け！" />
     <meta property="og:image" content="https://everydaycat.vercel.app/ogp-card.png" />
@@ -27,6 +27,12 @@
       img.logo {
         width: 180px;
         border-radius: 1rem;
+      }
+      .cat-image {
+        max-width: 400px;
+        border-radius: 16px;
+        margin-top: 1rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
       .fact-box {
         background: #fff;
@@ -67,6 +73,7 @@
     </header>
 
     <div class="fact-box" id="fact">🐈 読み込み中...</div>
+    <img id="catImage" src="" alt="ねこの画像" class="cat-image" />
 
     <button id="tweetBtn">X（旧Twitter）で共有</button>
 
@@ -75,24 +82,53 @@
     </footer>
 
     <script>
+      let currentImageUrl = "";
+      let currentFact = "";
+
+      // 🐾 猫の豆知識を取得
       async function fetchFact() {
         try {
           const res = await fetch("/api/cat");
           const data = await res.json();
-          document.getElementById("fact").textContent = data.fact || "猫の豆知識を取得できませんでした。";
-        } catch (e) {
-          document.getElementById("fact").textContent = "猫の豆知識を読み込めませんでした。";
+          currentFact = data.fact || "猫の豆知識を取得できませんでした。";
+          document.getElementById("fact").textContent = currentFact;
+        } catch {
+          document.getElementById("fact").textContent =
+            "猫の豆知識を読み込めませんでした。";
         }
       }
 
-      fetchFact();
+      // 🐱 ランダム猫画像を取得
+      async function fetchCatImage() {
+        try {
+          const res = await fetch("https://api.thecatapi.com/v1/images/search");
+          const data = await res.json();
+          currentImageUrl = data[0].url;
+          document.getElementById("catImage").src = currentImageUrl;
+        } catch {
+          document.getElementById("catImage").alt = "猫画像を取得できませんでした";
+        }
+      }
 
+      // 🐾 投稿ボタン処理
       document.getElementById("tweetBtn").addEventListener("click", () => {
-        const text = "🐾 今日の #毎日にゃんこ 豆知識はこちら！";
-        const url = "https://everydaycat.vercel.app/";
-        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        // 投稿文（短く固定）
+        const text = "🐾 今日の #毎日にゃんこ 🐈";
+        // 投稿リンク：猫画像＋Webサイト
+        const url = currentImageUrl || "https://everydaycat.vercel.app/";
+        const site = "https://everydaycat.vercel.app/";
+
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(url)}&hashtags=猫,にゃんこ&via=${encodeURIComponent(
+          site
+        )}`;
         window.open(tweetUrl, "_blank");
       });
+
+      // ページロード時に実行
+      fetchFact();
+      fetchCatImage();
     </script>
   </body>
 </html>
