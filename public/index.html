@@ -1,65 +1,103 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: #fff8fc;
-    color: #444;
-    text-align: center;
-    padding: 40px;
-  }
-  h1 {
-    color: #ff7eb9;
-    font-size: 2.4em;
-  }
-  button {
-    background: #ffb6c1;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: 0.3s;
-  }
-  button:hover {
-    background: #ff99aa;
-  }
-  .fact-box {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 3px 10px rgba(255, 182, 193, 0.3);
-  }
-</style>
-
-  <meta charset="UTF-8">
-  <title>🐾 ねこ豆知識メーカー</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>毎日にゃんこ | everyday cat</title>
+  <style>
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, #fffafc, #ffeef5);
+      text-align: center;
+      padding: 30px;
+      color: #444;
+    }
+    .logo {
+      font-size: 2.5rem;
+      color: #ff88aa;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: #ffb6c1;
+      margin-bottom: 30px;
+    }
+    img {
+      max-width: 300px;
+      border-radius: 16px;
+      margin: 20px auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .fact {
+      font-size: 1.1rem;
+      margin: 20px auto;
+      max-width: 80%;
+      color: #333;
+    }
+    button {
+      background-color: #ff88aa;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 10px;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #ff6f91;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>🐱 ねこ豆知識メーカー</h1>
-    <div class="card">
-      <img id="catImage" src="" alt="猫の画像">
-      <p id="catFact">読み込み中...</p>
-      <button id="refreshBtn">🐾 もう1回！</button>
-    </div>
-  </main>
+  <div class="logo">🐾 毎日にゃんこ</div>
+  <div class="subtitle">everyday cat</div>
+
+  <div id="content">
+    <p>にゃんこを呼び出し中...</p>
+  </div>
+
+  <button onclick="fetchCat()">もう1匹見る🐱</button>
+  <button id="tweetButton" style="display:none;">Xにポスト🐾</button>
+
+  <div class="note">
+    ※この豆知識は生成AIによって作成されており、正確でない可能性があります。
+  </div>
 
   <script>
     async function fetchCat() {
-      const res = await fetch("/api/cat");
-      const data = await res.json();
-      document.getElementById("catImage").src = data.image;
-      document.getElementById("catFact").textContent = data.fact;
+      const content = document.getElementById("content");
+      content.innerHTML = "<p>読み込み中にゃ...</p>";
+
+      try {
+        const res = await fetch("/api/cat");
+        const data = await res.json();
+
+        content.innerHTML = `
+          <img src="${data.image}" alt="猫の画像" />
+          <p class="fact">${data.fact}</p>
+        `;
+
+        // X（旧Twitter）投稿ボタン
+        const tweetText = encodeURIComponent(`🐱 今日のにゃんこ豆知識 🐾\n${data.fact}\n#毎日にゃんこ #everydaycat`);
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+        const tweetButton = document.getElementById("tweetButton");
+        tweetButton.onclick = () => window.open(tweetUrl, "_blank");
+        tweetButton.style.display = "inline-block";
+      } catch (error) {
+        content.innerHTML = "<p>エラーが発生しましたにゃ。</p>";
+        console.error(error);
+      }
     }
 
-    document.getElementById("refreshBtn").addEventListener("click", fetchCat);
-    fetchCat(); // ページ読み込み時に自動表示
+    fetchCat();
   </script>
 </body>
 </html>
