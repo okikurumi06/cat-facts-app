@@ -3,114 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="毎日かわいい猫とAIが教える豆知識をお届け！🐾 #毎日にゃんこ">
-  <meta property="og:title" content="毎日にゃんこ 🐾 Everyday Cat">
-  <meta property="og:description" content="AIが教える猫の豆知識とランダムな猫画像で癒されよう！">
-  <meta property="og:image" content="https://everydaycat.vercel.app/ogp.jpg">
+  <title>毎日にゃんこ everyday cat 🐾</title>
+  <meta name="description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
+  <meta property="og:title" content="毎日にゃんこ everyday cat 🐾">
+  <meta property="og:description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
+  <meta property="og:image" content="https://everydaycat.vercel.app/ogp.png">
   <meta property="og:url" content="https://everydaycat.vercel.app/">
   <meta name="twitter:card" content="summary_large_image">
-  <title>毎日にゃんこ 🐾 Everyday Cat</title>
+  <link rel="icon" href="/logo.png">
   <style>
     body {
       font-family: "Noto Sans JP", sans-serif;
-      text-align: center;
-      background-color: #fff8f0;
+      background: #fffaf8;
       color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
+      text-align: center;
+      padding: 2rem;
     }
     .logo {
-      width: 120px;
-      margin: 0 auto 15px;
-      display: block;
+      width: 160px;
+      margin-bottom: 10px;
     }
-    .cat-container {
-      display: inline-block;
-      position: relative;
-      background: #fff;
-      padding: 20px;
+    h1 {
+      font-size: 1.8rem;
+      color: #ff8888;
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .cat-img {
-      width: 300px;
-      height: 300px;
-      object-fit: cover;
+    img {
       border-radius: 12px;
-      margin-bottom: 15px;
-    }
-    .fact {
-      font-size: 1rem;
-      margin-bottom: 15px;
-      line-height: 1.6;
+      width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
     }
     button {
-      background-color: #1d9bf0;
-      color: white;
+      background: #1DA1F2;
       border: none;
+      color: white;
       padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      border-radius: 9999px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: 0.3s;
     }
     button:hover {
-      background-color: #0c7abf;
+      background: #0d8de1;
+    }
+    .note {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <img src="/logo.png" alt="毎日にゃんこ ロゴ" class="logo">
-  <h1>🐾 毎日にゃんこ 🐾</h1>
-  <div class="cat-container">
-    <img id="catImage" class="cat-img" src="" alt="猫の画像">
-    <p id="fact" class="fact">猫の豆知識を生成中…</p>
-    <button id="tweetButton">Xで共有する 🐈</button>
+  <img src="/logo.png" alt="毎日にゃんこ" class="logo">
+  <h1>🐾 毎日にゃんこ everyday cat 🐾</h1>
+
+  <div class="card">
+    <img id="catImage" src="" alt="猫の画像">
+    <div>
+      <button id="shareButton">🐈 Xでシェアする</button>
+    </div>
   </div>
 
+  <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
+
   <script>
-    async function fetchCatImage() {
-      const res = await fetch("https://api.thecatapi.com/v1/images/search");
-      const data = await res.json();
-      return data[0].url;
-    }
+    async function loadCat() {
+      const imgEl = document.getElementById("catImage");
+      imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
 
-    async function fetchCatFactAI(imageUrl) {
-      const res = await fetch("/api/catfact?imageUrl=" + encodeURIComponent(imageUrl));
-      const data = await res.json();
-      return data.fact;
-    }
-
-    async function init() {
-      const catImg = document.getElementById("catImage");
-      const factEl = document.getElementById("fact");
-      const tweetBtn = document.getElementById("tweetButton");
-
-      const imageUrl = await fetchCatImage();
-      catImg.src = imageUrl;
-
-      // 🧠 OpenAI経由の豆知識生成
-      try {
-        const fact = await fetchCatFactAI(imageUrl);
-        factEl.textContent = fact;
-      } catch {
-        factEl.textContent = "猫は寝るのが大好き！1日の約70%を寝て過ごすんです。";
-      }
-
-      // 🐈 X（旧Twitter）共有
-      tweetBtn.onclick = () => {
-        const text = `🐾 今日の #毎日にゃんこ 🐈\n${imageUrl}\n#猫 #にゃんこ\n`;
-        const url = "https://everydaycat.vercel.app/";
-        const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-        window.open(tweet, "_blank");
+      document.getElementById("shareButton").onclick = () => {
+        const text = "🐾 今日の #毎日にゃんこ 🐈";
+        const site = "https://everydaycat.vercel.app/";
+        const tweetUrl =
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
+        window.open(tweetUrl, "_blank");
       };
     }
-
-    init();
+    loadCat();
   </script>
 </body>
 </html>
