@@ -3,176 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>毎日にゃんこ everyday cat</title>
-  <meta name="description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾 #毎日にゃんこ">
-  <meta property="og:title" content="毎日にゃんこ everyday cat">
-  <meta property="og:description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾 #毎日にゃんこ">
-  <meta property="og:image" content="https://everydaycat.vercel.app/ogp.png">
+  <meta name="description" content="毎日かわいい猫とAIが教える豆知識をお届け！🐾 #毎日にゃんこ">
+  <meta property="og:title" content="毎日にゃんこ 🐾 Everyday Cat">
+  <meta property="og:description" content="AIが教える猫の豆知識とランダムな猫画像で癒されよう！">
+  <meta property="og:image" content="https://everydaycat.vercel.app/ogp.jpg">
   <meta property="og:url" content="https://everydaycat.vercel.app/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="毎日にゃんこ everyday cat">
-  <meta name="twitter:description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾">
-  <meta name="twitter:image" content="https://everydaycat.vercel.app/ogp.png">
+  <title>毎日にゃんこ 🐾 Everyday Cat</title>
   <style>
     body {
       font-family: "Noto Sans JP", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background-color: #fffaf7;
+      text-align: center;
+      background-color: #fff8f0;
+      color: #333;
       margin: 0;
-      padding: 0 20px;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    header img {
-      width: 48px;
-      height: 48px;
+      padding: 20px;
     }
     h1 {
-      font-size: 1.6rem;
-      color: #333;
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
-    #cat-container {
+    .logo {
+      width: 120px;
+      margin: 0 auto 15px;
+      display: block;
+    }
+    .cat-container {
+      display: inline-block;
       position: relative;
-      margin-top: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    #cat-img {
-      max-width: 90vw;
-      max-height: 60vh;
+    .cat-img {
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
+      margin-bottom: 15px;
     }
-    #cat-img:hover {
-      transform: scale(1.03);
+    .fact {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      line-height: 1.6;
     }
-    #fact {
-      margin-top: 24px;
-      font-size: 1.1rem;
-      color: #444;
-      background: #fff2e6;
-      padding: 12px 16px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-width: 600px;
-      text-align: center;
-    }
-    #tweet-btn {
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #000;
+    button {
+      background-color: #1d9bf0;
       color: white;
+      border: none;
       padding: 10px 16px;
-      border-radius: 9999px;
-      border: none;
-      font-weight: bold;
+      border-radius: 20px;
+      font-size: 0.95rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
+      transition: background 0.3s;
     }
-    #tweet-btn:hover {
-      background: #1DA1F2;
-      transform: translateX(-50%) scale(1.05);
-    }
-    #next-btn {
-      margin-top: 30px;
-      background: #ffcc80;
-      color: #333;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 9999px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: all 0.2s ease;
-    }
-    #next-btn:hover {
-      background: #ffa726;
-      transform: scale(1.05);
-    }
-    footer {
-      margin-top: 50px;
-      color: #888;
-      font-size: 0.9rem;
+    button:hover {
+      background-color: #0c7abf;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="./logo.png" alt="毎日にゃんこロゴ">
-    <h1>毎日にゃんこ everyday cat</h1>
-  </header>
-
-  <div id="cat-container">
-    <img id="cat-img" src="" alt="今日のにゃんこ">
-    <button id="tweet-btn">🐾 Xで共有</button>
+  <img src="/logo.png" alt="毎日にゃんこ ロゴ" class="logo">
+  <h1>🐾 毎日にゃんこ 🐾</h1>
+  <div class="cat-container">
+    <img id="catImage" class="cat-img" src="" alt="猫の画像">
+    <p id="fact" class="fact">猫の豆知識を生成中…</p>
+    <button id="tweetButton">Xで共有する 🐈</button>
   </div>
 
-  <div id="fact">猫の豆知識を読み込み中...</div>
-
-  <button id="next-btn">次のにゃんこを見る 🐱</button>
-
-  <footer>© 2025 毎日にゃんこ everyday cat</footer>
-
   <script>
-    const catImg = document.getElementById('cat-img');
-    const factDiv = document.getElementById('fact');
-    const tweetBtn = document.getElementById('tweet-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const serviceUrl = "https://everydaycat.vercel.app/";
-
-    // 猫画像取得
-    async function loadCat() {
+    async function fetchCatImage() {
       const res = await fetch("https://api.thecatapi.com/v1/images/search");
       const data = await res.json();
-      const url = data[0].url;
-      catImg.src = url;
-      catImg.dataset.url = url;
+      return data[0].url;
     }
 
-    // 猫の豆知識取得
-    async function loadFact() {
-      factDiv.textContent = "猫の豆知識を読み込み中...";
+    async function fetchCatFactAI(imageUrl) {
+      const res = await fetch("/api/catfact?imageUrl=" + encodeURIComponent(imageUrl));
+      const data = await res.json();
+      return data.fact;
+    }
+
+    async function init() {
+      const catImg = document.getElementById("catImage");
+      const factEl = document.getElementById("fact");
+      const tweetBtn = document.getElementById("tweetButton");
+
+      const imageUrl = await fetchCatImage();
+      catImg.src = imageUrl;
+
+      // 🧠 OpenAI経由の豆知識生成
       try {
-        const res = await fetch("https://catfact.ninja/fact");
-        const data = await res.json();
-        factDiv.textContent = "🐾 " + data.fact;
-      } catch (e) {
-        factDiv.textContent = "豆知識の取得に失敗しました。もう一度お試しください。";
+        const fact = await fetchCatFactAI(imageUrl);
+        factEl.textContent = fact;
+      } catch {
+        factEl.textContent = "猫は寝るのが大好き！1日の約70%を寝て過ごすんです。";
       }
+
+      // 🐈 X（旧Twitter）共有
+      tweetBtn.onclick = () => {
+        const text = `🐾 今日の #毎日にゃんこ 🐈\n${imageUrl}\n#猫 #にゃんこ\n`;
+        const url = "https://everydaycat.vercel.app/";
+        const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        window.open(tweet, "_blank");
+      };
     }
 
-    // 初回読み込み
-    async function loadAll() {
-      await Promise.all([loadCat(), loadFact()]);
-    }
-
-    loadAll();
-
-    // 次の猫ボタン
-    nextBtn.addEventListener("click", loadAll);
-
-    // X共有ボタン
-    tweetBtn.addEventListener("click", () => {
-      const catUrl = catImg.dataset.url;
-      const fact = factDiv.textContent.replace("🐾 ", "");
-      const text = `🐾 今日の #毎日にゃんこ 🐈\n${fact}\n${catUrl}\n${serviceUrl}\n#猫 #にゃんこ`;
-      const encodedText = encodeURIComponent(text);
-      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
-      window.open(tweetUrl, "_blank");
-    });
+    init();
   </script>
 </body>
 </html>
