@@ -1,29 +1,36 @@
-import OpenAI from "openai";
-
+// /api/catfact.js
 export default async function handler(req, res) {
+  const { imageUrl } = req.query;
   try {
-    // The Cat APIから画像を取得
-    const imageRes = await fetch("https://api.thecatapi.com/v1/images/search");
-    const imageData = await imageRes.json();
-    const catImage = imageData[0]?.url;
-
-    // OpenAIで日本語の猫豆知識を生成
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "あなたは猫の専門家として、猫に関する日本語の豆知識を1つだけ、親しみやすく短く（40文字以内）説明します。"
+          },
+          {
+            role: "user",
+            content: `猫の写真: ${imageUrl}`
+          }
+        ],
+        max_tokens: 100,
+      })
     });
 
-    const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。";
+    console.log("API Key loaded:", process.env.OPENAI_API_KEY ? "Yes" : "No");
+    const data = await response.json();
+    const fact = data.choices?.[0]?.message?.content?.trim() || "猫は毛づくろいで体温を整えています。";
+    res.status(200).json({ fact });
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const fact = completion.choices[0].message.content.trim();
-
-    res.status(200).json({ image: catImage, fact });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "エラーが発生しました" });
+    console.error(error);
+    res.status(500).json({ fact: "猫は寝るのが大好き！1日の約70%を寝て過ごすんです。" });
   }
 }
