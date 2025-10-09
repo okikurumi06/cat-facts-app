@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>毎日にゃんこ everyday cat</title>
-  <meta name="description" content="毎日かわいい猫画像で癒やされよう 🐾 #毎日にゃんこ">
+  <meta name="description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾 #毎日にゃんこ">
   <meta property="og:title" content="毎日にゃんこ everyday cat">
-  <meta property="og:description" content="毎日かわいい猫画像で癒やされよう 🐾 #毎日にゃんこ">
+  <meta property="og:description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾 #毎日にゃんこ">
   <meta property="og:image" content="https://everydaycat.vercel.app/ogp.png">
   <meta property="og:url" content="https://everydaycat.vercel.app/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="毎日にゃんこ everyday cat">
-  <meta name="twitter:description" content="毎日かわいい猫画像で癒やされよう 🐾">
+  <meta name="twitter:description" content="毎日かわいい猫画像と豆知識で癒やされよう 🐾">
   <meta name="twitter:image" content="https://everydaycat.vercel.app/ogp.png">
   <style>
     body {
@@ -23,6 +23,7 @@
       min-height: 100vh;
       background-color: #fffaf7;
       margin: 0;
+      padding: 0 20px;
     }
     header {
       display: flex;
@@ -44,7 +45,7 @@
     }
     #cat-img {
       max-width: 90vw;
-      max-height: 70vh;
+      max-height: 60vh;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       transition: transform 0.3s ease;
@@ -52,9 +53,20 @@
     #cat-img:hover {
       transform: scale(1.03);
     }
+    #fact {
+      margin-top: 24px;
+      font-size: 1.1rem;
+      color: #444;
+      background: #fff2e6;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 600px;
+      text-align: center;
+    }
     #tweet-btn {
       position: absolute;
-      bottom: -20px;
+      bottom: -25px;
       left: 50%;
       transform: translateX(-50%);
       background: #000;
@@ -74,8 +86,24 @@
       background: #1DA1F2;
       transform: translateX(-50%) scale(1.05);
     }
+    #next-btn {
+      margin-top: 30px;
+      background: #ffcc80;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+    #next-btn:hover {
+      background: #ffa726;
+      transform: scale(1.05);
+    }
     footer {
-      margin-top: 60px;
+      margin-top: 50px;
       color: #888;
       font-size: 0.9rem;
     }
@@ -92,14 +120,20 @@
     <button id="tweet-btn">🐾 Xで共有</button>
   </div>
 
+  <div id="fact">猫の豆知識を読み込み中...</div>
+
+  <button id="next-btn">次のにゃんこを見る 🐱</button>
+
   <footer>© 2025 毎日にゃんこ everyday cat</footer>
 
   <script>
     const catImg = document.getElementById('cat-img');
+    const factDiv = document.getElementById('fact');
     const tweetBtn = document.getElementById('tweet-btn');
+    const nextBtn = document.getElementById('next-btn');
     const serviceUrl = "https://everydaycat.vercel.app/";
 
-    // 猫画像をランダムに取得
+    // 猫画像取得
     async function loadCat() {
       const res = await fetch("https://api.thecatapi.com/v1/images/search");
       const data = await res.json();
@@ -108,12 +142,33 @@
       catImg.dataset.url = url;
     }
 
-    loadCat();
+    // 猫の豆知識取得
+    async function loadFact() {
+      factDiv.textContent = "猫の豆知識を読み込み中...";
+      try {
+        const res = await fetch("https://catfact.ninja/fact");
+        const data = await res.json();
+        factDiv.textContent = "🐾 " + data.fact;
+      } catch (e) {
+        factDiv.textContent = "豆知識の取得に失敗しました。もう一度お試しください。";
+      }
+    }
 
-    // Xで共有ボタン
+    // 初回読み込み
+    async function loadAll() {
+      await Promise.all([loadCat(), loadFact()]);
+    }
+
+    loadAll();
+
+    // 次の猫ボタン
+    nextBtn.addEventListener("click", loadAll);
+
+    // X共有ボタン
     tweetBtn.addEventListener("click", () => {
       const catUrl = catImg.dataset.url;
-      const text = `🐾 今日の #毎日にゃんこ 🐈\n${catUrl}\n${serviceUrl}\n#猫 #にゃんこ`;
+      const fact = factDiv.textContent.replace("🐾 ", "");
+      const text = `🐾 今日の #毎日にゃんこ 🐈\n${fact}\n${catUrl}\n${serviceUrl}\n#猫 #にゃんこ`;
       const encodedText = encodeURIComponent(text);
       const tweetUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
       window.open(tweetUrl, "_blank");
