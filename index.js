@@ -1,3 +1,4 @@
+//index.js
 import express from "express";
 import fetch from "node-fetch";
 import OpenAI from "openai";
@@ -18,11 +19,11 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// ? CORSを許可
+// ✅ CORS許可
 app.use(cors());
 
-// ? 静的ファイル配信
-app.use(express.static(__dirname));
+// ✅ 静的ファイル配信
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/cat", async (req, res) => {
   try {
@@ -32,7 +33,7 @@ app.get("/cat", async (req, res) => {
     const catData = await catRes.json();
     const catImageUrl = catData[0]?.url;
 
-    const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。50文字以内で。";
+    const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。40文字以内で。";
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
