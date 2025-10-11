@@ -31,6 +31,10 @@ app.use(cors());
 // ✅ 静的ファイルを配信（Vercel上でも /public がルートになる）
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/api/test", (req, res) => {
+  res.send("✅ Express route works on Vercel!");
+});
+
 // ✅ APIルート登録
 app.get("/api/generate-card", async (req, res) => {
   console.log("🎨 /api/generate-card called");
