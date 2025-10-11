@@ -1,8 +1,13 @@
-"dependencies": {
-  "@napi-rs/canvas": "^0.1.53",
-  "cors": "^2.8.5",
-  "dotenv": "^17.2.3",
-  "express": "^5.1.0",
-  "node-fetch": "^3.3.2",
-  "openai": "^4.104.0"
+{
+  "name": "cat-facts-app",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.53",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.104.0"
+  }
 }
