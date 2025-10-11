@@ -52,9 +52,13 @@ export default async function handler(req, res) {
 
     // 🖋️ フォント登録
     try {
-      const fontPath = path.join(process.cwd(), "fonts", "NotoSansJP-Regular.ttf");
-      GlobalFonts.registerFromPath(fontPath, "Noto Sans JP");
-      process.stdout.write("🖋️ フォント登録成功: NotoSansJP-Regular.ttf\n");
+      const fontJP = path.join(process.cwd(), "fonts", "NotoSansJP-Regular.ttf");
+      GlobalFonts.registerFromPath(fontJP, "Noto Sans JP");
+
+      const fontEmoji = path.join(process.cwd(), "fonts", "NotoColorEmoji.ttf");
+      GlobalFonts.registerFromPath(fontEmoji, "Noto Color Emoji");
+
+      process.stdout.write("🖋️ フォント登録成功: NotoSansJP + Emoji\n");
     } catch (e) {
       process.stdout.write(`⚠️ フォント登録失敗: ${e.message}\n`);
     }
@@ -79,7 +83,7 @@ export default async function handler(req, res) {
     wrapText(ctx, fact.replace(/🐾/g, ""), 20, 555, 560, 26);
 
     // 🐾 ロゴを右下に配置（絵文字部分はUnicode対応フォントで）
-    ctx.font = "16px 'Noto Sans JP'";
+    ctx.font = "16px 'Noto Color Emoji', 'Noto Sans JP'";
     ctx.fillStyle = "#ffcccc";
 
     // ✅ テキストの横幅を計測して右寄せ
