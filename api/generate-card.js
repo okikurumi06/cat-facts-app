@@ -52,10 +52,11 @@ export default async function handler(req, res) {
 
     // 🖋️ フォント登録
     try {
-      const fontPath = path.resolve("./fonts/NotoSansJP-Regular.ttf");
+      const fontPath = path.join(process.cwd(), "fonts", "NotoSansJP-Regular.ttf");
       GlobalFonts.registerFromPath(fontPath, "Noto Sans JP");
+      process.stdout.write("🖋️ フォント登録成功: NotoSansJP-Regular.ttf\n");
     } catch (e) {
-      process.stdout.write(`⚠️ フォント登録スキップ: ${e.message}\n`);
+      process.stdout.write(`⚠️ フォント登録失敗: ${e.message}\n`);
     }
 
     // 🖼️ 猫画像を描画
