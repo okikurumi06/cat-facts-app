@@ -7,13 +7,15 @@ export const config = {
 
 export default async function handler(req, res) {
   try {
+    process.stdout.write("🎨 /api/generate-card called\n");
+
     // 🐱 猫画像を取得
     const catRes = await fetch("https://api.thecatapi.com/v1/images/search");
     const catData = await catRes.json();
     const imageUrl = catData[0]?.url;
     if (!imageUrl) throw new Error("猫画像の取得に失敗しました。");
 
-    console.log("🐾 取得画像URL:", imageUrl);
+    process.stdout.write(`🐾 取得画像URL: ${imageUrl}\n`);
 
     // 🧠 AIで豆知識生成
     const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -40,20 +42,20 @@ export default async function handler(req, res) {
     });
 
     const aiData = await aiRes.json();
-    console.log("🧠 OpenAIレスポンス:", aiData);
+    process.stdout.write(`🧠 OpenAIレスポンス: ${JSON.stringify(aiData)}\n`);
 
     const fact =
       aiData?.choices?.[0]?.message?.content?.trim() ||
       "猫は高いところが大好き！";
 
-    console.log("📜 生成された豆知識:", fact);
+    process.stdout.write(`📜 生成された豆知識: ${fact}\n`);
 
     // 🖋️ フォント登録
     try {
       const fontPath = path.resolve("./fonts/NotoSansJP-Regular.ttf");
       GlobalFonts.registerFromPath(fontPath, "Noto Sans JP");
     } catch (e) {
-      console.warn("⚠️ フォント登録スキップ:", e.message);
+      process.stdout.write(`⚠️ フォント登録スキップ: ${e.message}\n`);
     }
 
     // 🖼️ 猫画像を描画
@@ -83,12 +85,11 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "image/png");
     res.send(canvas.toBuffer("image/png"));
   } catch (err) {
-    console.error("🐾 Error in /api/generate-card:", err);
+    process.stdout.write(`🐾 Error in /api/generate-card: ${err.message}\n`);
     res.status(500).json({ error: "猫カード生成に失敗しました。" });
   }
 }
 
-// テキスト改行処理
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const chars = text.split("");
   let line = "";
