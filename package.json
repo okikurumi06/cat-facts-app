@@ -2,6 +2,9 @@
   "name": "cat-facts-app",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.53",
     "cors": "^2.8.5",
