@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/generate-card.mjs": {
-      "runtime": "nodejs20.x"
-    }
-  }
-}
