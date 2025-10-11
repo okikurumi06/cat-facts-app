@@ -73,15 +73,19 @@ export default async function handler(req, res) {
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(0, 520, 600, 80);
 
-    // テキスト
+    // 🧠 豆知識テキスト（🐾を除去し日本語だけで描画）
     ctx.font = "22px 'Noto Sans JP'";
     ctx.fillStyle = "white";
-    wrapText(ctx, fact, 20, 555, 560, 26);
+    wrapText(ctx, fact.replace(/🐾/g, ""), 20, 555, 560, 26);
 
-    // ロゴ
+    // 🐾 ロゴを右下に配置（絵文字部分はUnicode対応フォントで）
     ctx.font = "16px 'Noto Sans JP'";
     ctx.fillStyle = "#ffcccc";
-    ctx.fillText("🐾 毎日にゃんこ everyday cat", 20, 590);
+
+    // ✅ テキストの横幅を計測して右寄せ
+    const logoText = "🐾 毎日にゃんこ everyday cat";
+    const textWidth = ctx.measureText(logoText).width;
+    ctx.fillText(logoText, 600 - textWidth - 20, 590);
 
     res.setHeader("Content-Type", "image/png");
     res.send(canvas.toBuffer("image/png"));
