@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import generateCardHandler from "./api/generate-card.js";
 
 dotenv.config();
+console.log("🚀 Vercel Express app initialized");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
