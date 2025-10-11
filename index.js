@@ -7,7 +7,7 @@ import path from "path";
 import cors from "cors";
 import { fileURLToPath } from "url";
 
-// generate-card を明示的に読み込む！
+// 🐾 generate-card を明示的に読み込む
 import generateCardHandler from "./api/generate-card.js";
 
 dotenv.config();
@@ -16,21 +16,32 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+
+// ✅ Vercel 環境ではポート番号を自動設定（ローカルでは3000）
+const PORT = process.env.PORT || 3000;
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// ✅ CORS許可
+// ✅ CORSを許可
 app.use(cors());
 
-// ✅ 静的ファイル配信
+// ✅ 静的ファイルを配信（Vercel上でも /public がルートになる）
 app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ APIルート登録
-app.get("/api/generate-card", (req, res) => generateCardHandler(req, res));
+app.get("/api/generate-card", async (req, res) => {
+  console.log("🎨 /api/generate-card called");
+  return generateCardHandler(req, res);
+});
 
+// ✅ デフォルトページ
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ✅ テスト用API（豆知識＋猫画像）
 app.get("/cat", async (req, res) => {
   try {
     const catRes = await fetch("https://api.thecatapi.com/v1/images/search", {
@@ -40,7 +51,8 @@ app.get("/cat", async (req, res) => {
     const catImageUrl = catData[0]?.url;
     console.log("🐱 Cat Image URL:", catImageUrl);
 
-    const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。40文字以内で。";
+    const prompt =
+      "猫に関する面白い豆知識を日本語で1つ教えてください。40文字以内で。";
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
@@ -49,11 +61,15 @@ app.get("/cat", async (req, res) => {
 
     res.json({ image: catImageUrl, fact });
   } catch (err) {
-    console.error(err);
+    console.error("🐾 /cat error:", err);
     res.status(500).json({ error: "エラーが発生しました" });
   }
 });
 
+// ✅ Express起動（Vercelでは自動実行）
 app.listen(PORT, () => {
-  console.log(`✅ Server is running at http://localhost:${PORT}`);
+  console.log(`✅ Server is running on port ${PORT}`);
 });
+
+// 🟢 Vercel 対応：エクスポート
+export default app;
