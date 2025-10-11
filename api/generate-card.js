@@ -30,7 +30,7 @@ export default async function handler(req, res) {
           {
             role: "system",
             content:
-              "あなたは猫の専門家です。猫に関する日本語の豆知識を40文字以内で、親しみやすく1つ教えてください。",
+              "あなたは猫の専門家です。猫に関する日本語の豆知識を50文字以内で、親しみやすく1つ教えてください。",
           },
           {
             role: "user",
