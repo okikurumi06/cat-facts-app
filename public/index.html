@@ -132,22 +132,58 @@
   </div>
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
-
+  
+  <!--
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
-      //imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
-      imgEl.src = "https://cat-facts-app-topaz.vercel.app/api/generate-card?" + Date.now();
+      try {
+        const res = await fetch("https://cat-facts-app-topaz.vercel.app/api/generate-card?" + Date.now());
+        if (!res.ok) throw new Error("API呼び出しに失敗しました");
+
+        const blob = await res.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        imgEl.src = imageUrl;
+
+        // 画像URLをツイートに使えるよう保持
+        window.generatedImageUrl = imageUrl;
+      } catch (e) {
+        console.error("🐾 猫画像の取得に失敗:", e);
+        imgEl.alt = "画像の取得に失敗しました。";
+      }
 
       document.getElementById("shareButton").onclick = () => {
         const text = "🐾 今日の #毎日にゃんこ 🐈";
-        const site = "https://everydaycat.vercel.app/";
+        const site = "https://cat-facts-app-topaz.vercel.app/";
+
+        // ✅ Twitter投稿リンクに画像URLを埋め込む
         const tweetUrl =
           `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
+
+        // X側でURLを展開 → サムネイル付きツイートになる
         window.open(tweetUrl, "_blank");
       };
     }
     loadCat();
   </script>
-</body>
+  -->
+
+  <script>
+    async function loadCat() {
+      const imgEl = document.getElementById("catImage");
+      const res = await fetch("/api/generate-card?" + Date.now());
+      const data = await res.json();
+      imgEl.src = data.imageUrl;
+
+      document.getElementById("shareButton").onclick = () => {
+        const text = "🐾 今日の #毎日にゃんこ 🐈";
+        const tweetUrl =
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.imageUrl)}&hashtags=猫,にゃんこ`;
+        window.open(tweetUrl, "_blank");
+      };
+    }
+    loadCat();
+  </script>
+
+ </body>
 </html>
