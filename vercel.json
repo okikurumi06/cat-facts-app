@@ -1,8 +1,7 @@
 {
   "functions": {
     "api/generate-card.js": {
-      "runtime": "nodejs20.x",
-      "includeFiles": "fonts/**"
+      "runtime": "nodejs20.x"
     }
   }
 }
