@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -167,18 +167,31 @@
     loadCat();
   </script>
   -->
-
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
-      const res = await fetch("/api/generate-card?" + Date.now());
-      const data = await res.json();
-      imgEl.src = data.imageUrl;
 
+      try {
+        // 🐾 画像APIを呼び出してBlobとして取得
+        const response = await fetch("/api/generate-card");
+        if (!response.ok) throw new Error("画像取得に失敗しました。");
+
+        const blob = await response.blob(); // ← ✅ PNGバイナリを取得
+        const objectURL = URL.createObjectURL(blob);
+        imgEl.src = objectURL; // ← 生成画像を表示！
+
+      } catch (error) {
+        console.error("🐾 画像ロードエラー:", error);
+        imgEl.alt = "猫画像の読み込みに失敗しました。";
+      }
+
+      // 🐈 X共有ボタン
       document.getElementById("shareButton").onclick = () => {
         const text = "🐾 今日の #毎日にゃんこ 🐈";
-        const tweetUrl =
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.imageUrl)}&hashtags=猫,にゃんこ`;
+        const site = "https://cat-facts-app-topaz.vercel.app/";
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
         window.open(tweetUrl, "_blank");
       };
     }
