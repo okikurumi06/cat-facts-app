@@ -136,8 +136,9 @@
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
-      imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
-      
+      //imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
+      imgEl.src = "https://cat-facts-app-topaz.vercel.app/api/generate-card?" + Date.now();
+
       document.getElementById("shareButton").onclick = () => {
         const text = "🐾 今日の #毎日にゃんこ 🐈";
         const site = "https://everydaycat.vercel.app/";
