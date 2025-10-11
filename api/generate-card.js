@@ -1,22 +1,14 @@
 // /api/generate-card.js
 import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
 
 export const config = {
   runtime: "nodejs",
 };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 export default async function handler(req, res) {
   try {
     process.stdout.write("🎨 /api/generate-card called\n");
-
-    // 🧹 古い画像の自動削除（7日より前のファイル）
-    cleanupOldImages();
 
     // 🐱 猫画像を取得
     const catRes = await fetch("https://api.thecatapi.com/v1/images/search");
@@ -75,6 +67,7 @@ export default async function handler(req, res) {
 
     const canvas = createCanvas(600, 600);
     const ctx = canvas.getContext("2d");
+
     ctx.drawImage(img, 0, 0, 600, 600);
 
     // 下部の黒帯
@@ -93,55 +86,16 @@ export default async function handler(req, res) {
     const textWidth = ctx.measureText(logoText).width;
     ctx.fillText(logoText, 600 - textWidth - 20, 590);
 
-    // 📅 日付ファイル名生成
-    const today = new Date();
-    const dateStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
-    const fileName = `${dateStr}.png`;
-
-    // 📂 保存先ディレクトリ
-    const outputDir = path.join(process.cwd(), "public", "generated");
-    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
-
-    // 📸 ファイル保存
-    const outputPath = path.join(outputDir, fileName);
-    fs.writeFileSync(outputPath, canvas.toBuffer("image/png"));
-
-    // 🌐 公開URLを返す
-    const publicUrl = `https://cat-facts-app-topaz.vercel.app/generated/${fileName}`;
-    process.stdout.write(`✅ 保存完了: ${publicUrl}\n`);
-
-    res.json({ imageUrl: publicUrl, fact });
+    // 📤 PNGを直接返す
+    res.setHeader("Content-Type", "image/png");
+    res.send(canvas.toBuffer("image/png"));
   } catch (err) {
     process.stdout.write(`🐾 Error in /api/generate-card: ${err.message}\n`);
     res.status(500).json({ error: "猫カード生成に失敗しました。" });
   }
 }
 
-// ✅ 古い画像を削除（7日より前のファイルを削除）
-function cleanupOldImages() {
-  const dir = path.join(process.cwd(), "public", "generated");
-  if (!fs.existsSync(dir)) return;
-
-  const files = fs.readdirSync(dir);
-  const now = new Date();
-
-  files.forEach((file) => {
-    if (!file.endsWith(".png")) return;
-
-    const match = file.match(/^(\d{4}-\d{2}-\d{2})\.png$/);
-    if (match) {
-      const fileDate = new Date(match[1]);
-      const diffDays = (now - fileDate) / (1000 * 60 * 60 * 24);
-
-      if (diffDays > 7) {
-        fs.unlinkSync(path.join(dir, file));
-        process.stdout.write(`🧹 古い画像削除: ${file}\n`);
-      }
-    }
-  });
-}
-
-// 改行処理
+// テキスト改行処理
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const chars = text.split("");
   let line = "";
