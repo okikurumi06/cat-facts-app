@@ -1,20 +1,21 @@
-// /api/generate-card.js
 import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import path from "path";
 
 export const config = {
-  runtime: "nodejs", // EdgeではなくNodeランタイムで動作
+  runtime: "nodejs",
 };
 
 export default async function handler(req, res) {
   try {
-    // 🐱 1️⃣ 猫画像を取得
+    // 🐱 猫画像を取得
     const catRes = await fetch("https://api.thecatapi.com/v1/images/search");
     const catData = await catRes.json();
     const imageUrl = catData[0]?.url;
     if (!imageUrl) throw new Error("猫画像の取得に失敗しました。");
 
-    // 🧠 2️⃣ AIで豆知識生成
+    console.log("🐾 取得画像URL:", imageUrl);
+
+    // 🧠 AIで豆知識生成
     const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -39,19 +40,23 @@ export default async function handler(req, res) {
     });
 
     const aiData = await aiRes.json();
+    console.log("🧠 OpenAIレスポンス:", aiData);
+
     const fact =
-      aiData.choices?.[0]?.message?.content?.trim() ||
+      aiData?.choices?.[0]?.message?.content?.trim() ||
       "猫は高いところが大好き！";
 
-    // 🖋️ 3️⃣ フォント登録（NotoSansJPを同梱している場合）
+    console.log("📜 生成された豆知識:", fact);
+
+    // 🖋️ フォント登録
     try {
       const fontPath = path.resolve("./fonts/NotoSansJP-Regular.ttf");
       GlobalFonts.registerFromPath(fontPath, "Noto Sans JP");
     } catch (e) {
-      console.warn("フォント登録スキップ:", e.message);
+      console.warn("⚠️ フォント登録スキップ:", e.message);
     }
 
-    // 🖼️ 4️⃣ 猫画像をfetchしてCanvasで描画
+    // 🖼️ 猫画像を描画
     const imgRes = await fetch(imageUrl);
     const buffer = Buffer.from(await imgRes.arrayBuffer());
     const img = await loadImage(buffer);
@@ -61,11 +66,11 @@ export default async function handler(req, res) {
 
     ctx.drawImage(img, 0, 0, 600, 600);
 
-    // 下部に黒帯
+    // 下部の黒帯
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(0, 520, 600, 80);
 
-    // テキスト描画
+    // テキスト
     ctx.font = "22px 'Noto Sans JP'";
     ctx.fillStyle = "white";
     wrapText(ctx, fact, 20, 555, 560, 26);
@@ -75,17 +80,15 @@ export default async function handler(req, res) {
     ctx.fillStyle = "#ffcccc";
     ctx.fillText("🐾 毎日にゃんこ everyday cat", 20, 590);
 
-    // 出力
     res.setHeader("Content-Type", "image/png");
     res.send(canvas.toBuffer("image/png"));
-
   } catch (err) {
     console.error("🐾 Error in /api/generate-card:", err);
     res.status(500).json({ error: "猫カード生成に失敗しました。" });
   }
 }
 
-// 🪄 テキスト改行処理
+// テキスト改行処理
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const chars = text.split("");
   let line = "";
