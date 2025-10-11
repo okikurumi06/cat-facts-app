@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@vercel/og": "^0.6.8",
+    "@vercel/og": "^0.8.5",
     "canvas": "^3.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
