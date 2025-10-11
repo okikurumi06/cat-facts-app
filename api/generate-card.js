@@ -1,6 +1,6 @@
 // /api/generate-card.js
 export const config = {
-  runtime: "nodejs20.x",
+  runtime: "nodejs",
 };
 import { createCanvas, loadImage, registerFont } from "canvas";
 import path from "path";
