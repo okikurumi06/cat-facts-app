@@ -1,4 +1,7 @@
 // /api/generate-card.js
+export const config = {
+  runtime: "nodejs", // ← これでEdgeではなくNodeランタイムで動作
+};
 import { createCanvas, loadImage, registerFont } from "canvas";
 import path from "path";
 
