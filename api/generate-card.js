@@ -1,6 +1,6 @@
 // /api/generate-card.js
 export const config = {
-  runtime: "nodejs", // ← これでEdgeではなくNodeランタイムで動作
+  runtime: "nodejs20", // ✅ 正しい形式（Node.js v20ランタイムを指定）
 };
 import { createCanvas, loadImage, registerFont } from "canvas";
 import path from "path";
