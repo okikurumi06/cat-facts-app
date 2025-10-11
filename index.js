@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
 import { fileURLToPath } from "url";
-import generateCardHandler from "./api/generate-card.js"; // ← ✅ default export を読み込む
 
 dotenv.config();
 
