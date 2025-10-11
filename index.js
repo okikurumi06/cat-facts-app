@@ -1,4 +1,4 @@
-//index.js
+// index.js
 import express from "express";
 import fetch from "node-fetch";
 import OpenAI from "openai";
@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
 import { fileURLToPath } from "url";
+
+// generate-card を明示的に読み込む！
+import generateCardHandler from "./api/generate-card.js";
 
 dotenv.config();
 
@@ -25,8 +28,8 @@ app.use(cors());
 // ✅ 静的ファイル配信
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ APIルート登録（ここが重要！）
-app.get("/api/generate-card", generateCardHandler); // ← これを追加！
+// ✅ APIルート登録
+app.get("/api/generate-card", (req, res) => generateCardHandler(req, res));
 
 app.get("/cat", async (req, res) => {
   try {
@@ -35,7 +38,7 @@ app.get("/cat", async (req, res) => {
     });
     const catData = await catRes.json();
     const catImageUrl = catData[0]?.url;
-    console.log("🐱 Cat Image URL:", catImageUrl); // ← ここ追加！
+    console.log("🐱 Cat Image URL:", catImageUrl);
 
     const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。40文字以内で。";
     const completion = await client.chat.completions.create({
@@ -52,5 +55,5 @@ app.get("/cat", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`? Server is running at http://localhost:${PORT}`);
+  console.log(`✅ Server is running at http://localhost:${PORT}`);
 });
