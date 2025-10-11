@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/generate-card.js": {
+      "runtime": "nodejs"
+    },
+    "api/og.js": {
+      "runtime": "edge"
+    }
+  }
+}
