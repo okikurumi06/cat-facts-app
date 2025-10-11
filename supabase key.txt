@@ -1,0 +1,7 @@
+supabase key
+
+projectURL
+ https://eragcjxqqovmqpjftxdd.supabase.co
+
+SUPABASE_SERVICE_ROLE_KEY
+ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyYWdjanhxcW92bXFwamZ0eGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxNzc0MzIsImV4cCI6MjA3NTc1MzQzMn0.MXSd49msicD10_RnY1WTIfy_yR3vq7dIuoSC-dM0DX0
