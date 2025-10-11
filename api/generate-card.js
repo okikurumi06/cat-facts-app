@@ -87,7 +87,7 @@ export default async function handler(req, res) {
     ctx.fillStyle = "#ffcccc";
 
     // ✅ テキストの横幅を計測して右寄せ
-    const logoText = "🐾 毎日にゃんこ everyday cat";
+    const logoText = "🐾毎日にゃんこ everydaycat";
     const textWidth = ctx.measureText(logoText).width;
     ctx.fillText(logoText, 600 - textWidth - 20, 590);
 
