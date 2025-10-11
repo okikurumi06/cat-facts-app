@@ -5,11 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>毎日にゃんこ everyday cat 🐾</title>
   <meta name="description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
-  <meta property="og:title" content="毎日にゃんこ everyday cat 🐾">
+
+  <!-- OGP基本情報 -->
+  <meta property="og:title" content="毎日にゃんこ - 今日の猫と豆知識" />
+  <meta property="og:description" content="かわいい猫画像と豆知識を毎日お届け！" />
+  <meta property="og:image" content="https://everydaycat.vercel.app/api/og?fact=猫は1日の半分以上を寝て過ごします&img=https://placekitten.com/800/400" />
+  <meta property="og:url" content="https://everydaycat.vercel.app/" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitterカード設定 -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="毎日にゃんこ - 今日の猫と豆知識" />
+  <meta name="twitter:description" content="かわいい猫画像と豆知識を毎日お届け！" />
+  <meta name="twitter:image" content="https://everydaycat.vercel.app/og-image.jpg" />
+  <meta name="twitter:image" content="https://everydaycat.vercel.app/api/og?fact=猫は1日の半分以上を寝て過ごします&img=https://placekitten.com/800/400" />
+
+  <meta name="twitter:site" content="@your_twitter_account" />
+
+  <!--<meta property="og:title" content="毎日にゃんこ everyday cat 🐾">
   <meta property="og:description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
   <meta property="og:image" content="https://everydaycat.vercel.app/ogp.png">
   <meta property="og:url" content="https://everydaycat.vercel.app/">
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary_large_image">-->
+
   <link rel="icon" href="/logo.png">
   <style>
     body {
@@ -78,8 +96,9 @@
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
-      imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
-
+      //imgEl.src = "https://everydaycat.vercel.app/api/generate-card?" + Date.now();
+      imgEl.src = "/api/generate-card?" + Date.now();
+      
       document.getElementById("shareButton").onclick = () => {
         const text = "🐾 今日の #毎日にゃんこ 🐈";
         const site = "https://everydaycat.vercel.app/";

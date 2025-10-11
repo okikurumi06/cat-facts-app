@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
 import { fileURLToPath } from "url";
+import generateCardHandler from "./api/generate-card.js"; // ← ✅ default export を読み込む
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ app.use(cors());
 // ✅ 静的ファイル配信
 app.use(express.static(path.join(__dirname, "public")));
 
+// ✅ APIルート登録（ここが重要！）
+app.get("/api/generate-card", generateCardHandler); // ← これを追加！
+
 app.get("/cat", async (req, res) => {
   try {
     const catRes = await fetch("https://api.thecatapi.com/v1/images/search", {
@@ -32,6 +36,7 @@ app.get("/cat", async (req, res) => {
     });
     const catData = await catRes.json();
     const catImageUrl = catData[0]?.url;
+    console.log("🐱 Cat Image URL:", catImageUrl); // ← ここ追加！
 
     const prompt = "猫に関する面白い豆知識を日本語で1つ教えてください。40文字以内で。";
     const completion = await client.chat.completions.create({
