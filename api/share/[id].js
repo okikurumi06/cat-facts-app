@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs", // ← edge から変更
 };
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
