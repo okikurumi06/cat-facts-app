@@ -2,6 +2,7 @@
 import { createCanvas, loadImage, GlobalFonts } from "@napi-rs/canvas";
 import { createClient } from "@supabase/supabase-js";
 import path from "path";
+import crypto from "crypto";
 
 // 🔧 Supabase設定
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -16,27 +17,23 @@ export default async function handler(req, res) {
   try {
     console.log("🎨 /api/generate-card called");
 
-    // 📅 日付とユーザー識別子を生成（IPを簡易IDとして利用）
+    // 📅 ユーザー識別（簡易）＋日付
     const today = new Date().toISOString().split("T")[0];
     const userId = req.headers["x-forwarded-for"] || "anon";
 
-    // ✅ 既存データ確認（1日1枚ルール）
+    // ✅ 既存データ（1日1枚ルール）
     const { data: existing } = await supabase
       .from("cat_facts")
-      .select("fact,image_url")
+      .select("fact,image_url,short_id")
       .eq("user_id", userId)
       .eq("date", today)
       .limit(1);
 
     if (existing?.length) {
-      const fact = existing[0].fact;
-      const imageUrl = existing[0].image_url;
-
-      // ✅ OGP対応シェアURLを生成して返す
-      const shareUrl = `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(imageUrl)}&fact=${encodeURIComponent(fact)}`;
-
-      console.log("📦 既存データ再利用:", imageUrl);
-      return res.json({ imageUrl, fact, shareUrl });
+      const { fact, image_url, short_id } = existing[0];
+      const shareUrl = `https://everydaycat.vercel.app/api/share/${short_id}`;
+      console.log("📦 既存データ再利用:", image_url);
+      return res.json({ imageUrl: image_url, fact, shareUrl });
     }
 
     // 🐱 猫画像取得
@@ -46,7 +43,7 @@ export default async function handler(req, res) {
     if (!imageUrl) throw new Error("猫画像の取得に失敗しました。");
     console.log("🐾 取得画像URL:", imageUrl);
 
-    // 🧠 AIで豆知識生成
+    // 🧠 豆知識生成
     const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -79,80 +76,72 @@ export default async function handler(req, res) {
     // 🖋️ フォント登録
     try {
       const fontJP = path.join(process.cwd(), "fonts", "NotoSansJP-Regular.ttf");
-      GlobalFonts.registerFromPath(fontJP, "Noto Sans JP");
       const fontEmoji = path.join(process.cwd(), "fonts", "NotoColorEmoji.ttf");
+      GlobalFonts.registerFromPath(fontJP, "Noto Sans JP");
       GlobalFonts.registerFromPath(fontEmoji, "Noto Color Emoji");
-      console.log("🖋️ フォント登録成功: NotoSansJP + Emoji");
+      console.log("🖋️ フォント登録成功");
     } catch (e) {
       console.warn("⚠️ フォント登録失敗:", e.message);
     }
 
-    // 🖼️ 猫画像を描画
+    // 🖼️ 画像合成
     const imgRes = await fetch(imageUrl);
     const buffer = Buffer.from(await imgRes.arrayBuffer());
     const img = await loadImage(buffer);
     const canvas = createCanvas(600, 600);
     const ctx = canvas.getContext("2d");
-
     ctx.drawImage(img, 0, 0, 600, 600);
-
-    // 黒帯と豆知識
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(0, 520, 600, 80);
     ctx.font = "22px 'Noto Sans JP'";
     ctx.fillStyle = "white";
-    wrapText(ctx, fact.replace(/🐾/g, ""), 20, 555, 560, 26);
-
-    // 右下ロゴ（🐾間のスペースを調整済み）
+    wrapText(ctx, fact, 20, 555, 560, 26);
     ctx.font = "16px 'Noto Color Emoji', 'Noto Sans JP'";
     ctx.fillStyle = "#ffcccc";
     const logoText = "🐾毎日にゃんこeverydaycat";
     const textWidth = ctx.measureText(logoText).width;
     ctx.fillText(logoText, 600 - textWidth - 20, 590);
 
-    // 🪣 Supabase Storageへ保存
+    // 📤 Supabaseへアップロード
     const fileName = `generated/user-${userId}/${today}-${Date.now()}.png`;
     const { error: uploadError } = await supabase.storage
       .from("cat-cards")
       .upload(fileName, canvas.toBuffer("image/png"), {
         contentType: "image/png",
       });
-
     if (uploadError) throw uploadError;
 
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/cat-cards/${fileName}`;
     console.log("🌐 公開URL:", publicUrl);
 
-    // ✅ Supabase cat_facts に登録
-    const { data: upsertData, error: upsertError } = await supabase
-      .from("cat_facts")
-      .upsert({
-        user_id: userId,
-        date: today,
-        fact,
-        image_url: publicUrl,
-      });
+    // 🆔 短縮ID生成（6桁ランダム）
+    const shortId = crypto.randomBytes(3).toString("hex");
+
+    // 💾 Supabase保存
+    const { error: upsertError } = await supabase.from("cat_facts").upsert({
+      user_id: userId,
+      date: today,
+      fact,
+      image_url: publicUrl,
+      short_id: shortId,
+    });
 
     if (upsertError) {
       console.error("❌ Supabase upsert error:", upsertError);
     } else {
-      console.log("📝 Supabase upsert success:", upsertData);
+      console.log("📝 Supabase upsert success!");
     }
 
-    // ✅ シェア用OGPページURLを生成
-    const shareUrl = `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(publicUrl)}&fact=${encodeURIComponent(fact)}`;
-   
-    // ✅ 応答内容に shareUrl を追加
+    // ✅ OGP対応シェアURL
+    const shareUrl = `https://everydaycat.vercel.app/api/share/${shortId}`;
     res.json({ imageUrl: publicUrl, fact, shareUrl });
-
-
   } catch (err) {
     console.error("🐾 Error in /api/generate-card:", err);
     res.status(500).json({ error: "猫カード生成に失敗しました。" });
   }
 }
 
-// 🪄 テキスト改行処理
+// 🪄 テキスト改行
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const chars = text.split("");
   let line = "";
