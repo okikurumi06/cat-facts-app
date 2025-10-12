@@ -18,7 +18,12 @@ export default async function handler(req, res) {
     console.log("🎨 /api/generate-card called");
 
     // 📅 ユーザー識別（簡易）＋日付
-    const today = new Date().toISOString().split("T")[0];
+    //const today = new Date().toISOString().split("T")[0];
+    // JST（日本時間）での日付を生成
+    const now = new Date();
+    const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const today = jstNow.toISOString().split("T")[0];
+
     const userId = req.headers["x-forwarded-for"] || "anon";
 
     // ✅ 既存データ確認（1日1枚ルール）
