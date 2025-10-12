@@ -163,15 +163,13 @@
       imgEl.style.display = "none";
 
       try {
+        // ✅ JSONを受け取るよう変更
         const res = await fetch("/api/generate-card?" + Date.now());
         if (!res.ok) throw new Error("画像取得に失敗しました");
 
-        const blob = await res.blob();
-        const objectURL = URL.createObjectURL(blob);
-
-        imgEl.src = objectURL;
+        const data = await res.json(); // ← JSONで受け取る
+        imgEl.src = data.imageUrl;     // ← Supabaseの公開URLをセット
         imgEl.onload = () => {
-          // 🐾 読み込み完了で切り替え
           loader.style.display = "none";
           imgEl.style.display = "block";
         };
@@ -183,12 +181,14 @@
       document.getElementById("shareButton").onclick = () => {
         const text = "🐾 今日の #毎日にゃんこ 🐈";
         const site = "https://everydaycat.vercel.app/";
-        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
+        const tweetUrl =
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
         window.open(tweetUrl, "_blank");
       };
     }
 
     loadCat();
   </script>
+
 </body>
 </html>
