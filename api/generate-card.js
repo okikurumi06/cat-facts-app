@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const today = new Date().toISOString().split("T")[0];
     const userId = req.headers["x-forwarded-for"] || "anon";
 
-    // ✅ 既存データ（1日1枚ルール）
+    // ✅ 既存データ確認（1日1枚ルール）
     const { data: existing } = await supabase
       .from("cat_facts")
       .select("fact,image_url,short_id")
@@ -29,16 +29,12 @@ export default async function handler(req, res) {
       .eq("date", today)
       .limit(1);
 
+    // 🟢 既存データがある場合はそれを再利用
     if (existing?.length) {
-      const fact = existing[0].fact;
-      const imageUrl = existing[0].image_url;
-
-      // ✅ ここで shareUrl を再生成する（新規でも既存でも必ず生成）
-      const shareId = imageUrl.split("/").pop().replace(".png", "");
-      const shareUrl = `https://everydaycat.vercel.app/api/share/${shareId}`;
-
-      console.log("📦 既存データ再利用:", imageUrl);
-      return res.json({ imageUrl, fact, shareUrl });
+      const { fact, image_url, short_id } = existing[0];
+      const shareUrl = `https://everydaycat.vercel.app/api/share/${short_id}`;
+      console.log("📦 既存データ再利用:", image_url);
+      return res.json({ imageUrl: image_url, fact, shareUrl });
     }
 
     // 🐱 猫画像取得
@@ -119,7 +115,7 @@ export default async function handler(req, res) {
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/cat-cards/${fileName}`;
     console.log("🌐 公開URL:", publicUrl);
 
-    // 🆔 短縮ID生成（6桁ランダム）
+    // 🆔 short_id 生成（6桁ランダム）
     const shortId = crypto.randomBytes(3).toString("hex");
 
     // 💾 Supabase保存
