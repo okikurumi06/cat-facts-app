@@ -5,26 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>毎日にゃんこ everyday cat 🐾</title>
   <meta name="description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
+
+  <meta property="og:title" content="毎日にゃんこ - 今日の猫と豆知識" />
+  <meta property="og:description" content="AIが生成したかわいい猫画像と豆知識を毎日お届け！🐾" />
+  <meta property="og:image" content="https://everydaycat.vercel.app/api/og-card?fact=猫は日向ぼっこが大好き☀️&img=https://cdn2.thecatapi.com/images/2do.jpg" />
+  <meta property="og:url" content="https://everydaycat.vercel.app/" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="毎日にゃんこ - 今日の猫と豆知識" />
+  <meta name="twitter:description" content="AIが生成したかわいい猫画像と豆知識を毎日お届け！🐱" />
+  <meta name="twitter:image" content="https://everydaycat.vercel.app/api/og-card?fact=猫は日向ぼっこが大好き☀️&img=https://cdn2.thecatapi.com/images/2do.jpg" />
+  <meta name="twitter:site" content="@your_twitter_account" />
+
   <link rel="icon" href="/logo.png">
+
   <style>
+    :root {
+      --main-color: #ff8888;
+      --bg-color: #fffaf8;
+      --text-color: #333;
+    }
+
     body {
       font-family: "Noto Sans JP", sans-serif;
-      background: #fffaf8;
-      color: #333;
+      background: var(--bg-color);
+      color: var(--text-color);
       text-align: center;
-      padding: 2rem;
       margin: 0;
+      padding: 1.5rem;
     }
+
     .logo {
       width: 140px;
       margin: 0 auto 10px;
       display: block;
     }
+
     h1 {
       font-size: 1.8rem;
-      color: #ff8888;
+      color: var(--main-color);
       margin-bottom: 1.2rem;
     }
+
     .card {
       background: white;
       border-radius: 16px;
@@ -32,13 +55,32 @@
       max-width: 520px;
       margin: 0 auto;
       padding: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 300px; /* 🆕 画像がまだの時でもカード高さ確保 */
     }
+
     img {
       border-radius: 12px;
       width: 100%;
       height: auto;
       margin-bottom: 1rem;
     }
+
+    /* 🆕 ローディングアニメーション */
+    .loader {
+      font-size: 1.1rem;
+      color: #ff8888;
+      font-weight: bold;
+      animation: blink 1.4s infinite;
+      margin-top: 2rem;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
     button {
       background: #1DA1F2;
       border: none;
@@ -51,31 +93,43 @@
       width: 100%;
       max-width: 260px;
     }
-    button:hover { background: #0d8de1; }
+
+    button:hover {
+      background: #0d8de1;
+    }
+
     .note {
       margin-top: 1rem;
       font-size: 0.85rem;
       color: #666;
     }
+
     footer {
       margin-top: 2rem;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       color: #aaa;
     }
+
     footer a {
-      color: #bbb;
+      color: #aaa;
       text-decoration: none;
     }
-    footer a:hover {
-      text-decoration: underline;
-      color: #888;
-    }
+
+    /* 📱 スマホ対応 */
     @media (max-width: 600px) {
-      body { padding: 1rem; }
-      h1 { font-size: 1.4rem; }
-      .logo { width: 120px; }
-      .card { padding: 12px; border-radius: 12px; }
-      button { font-size: 0.95rem; padding: 10px 14px; }
+      h1 {
+        font-size: 1.4rem;
+      }
+      .logo {
+        width: 120px;
+      }
+      .card {
+        padding: 12px;
+      }
+      button {
+        font-size: 0.95rem;
+        padding: 10px 14px;
+      }
     }
   </style>
 </head>
@@ -84,58 +138,56 @@
   <h1>🐾 毎日にゃんこ everyday cat 🐾</h1>
 
   <div class="card">
-    <img id="catImage" src="" alt="猫の画像">
-    <div><button id="shareButton">🐈 Xでシェアする</button></div>
+    <!-- 🆕 ローディングメッセージ -->
+    <div id="loader" class="loader">🐾 にゃんこ生成中...</div>
+
+    <img id="catImage" src="" alt="猫の画像" style="display:none;">
+    <div>
+      <button id="shareButton">🐈 Xでシェアする</button>
+    </div>
   </div>
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
 
-  <!-- 🐾 フッターに作成者リンクを追加 -->
   <footer>
     Created by <a href="https://github.com/okikurumi06" target="_blank">okikurumi</a>
   </footer>
 
   <script>
     async function loadCat() {
-      let userId = localStorage.getItem("userId");
-      if (!userId) {
-        userId = "user-" + Math.random().toString(36).substring(2, 10);
-        localStorage.setItem("userId", userId);
-      }
-
       const imgEl = document.getElementById("catImage");
+      const loader = document.getElementById("loader");
+
+      // 🐾 ローディング開始
+      loader.style.display = "block";
+      imgEl.style.display = "none";
 
       try {
-        const res = await fetch(`/api/generate-card?user=${userId}`);
-        const data = await res.json();
-        if (!data.imageUrl) throw new Error("画像URLが取得できませんでした");
+        const res = await fetch("/api/generate-card?" + Date.now());
+        if (!res.ok) throw new Error("画像取得に失敗しました");
 
-        imgEl.src = data.imageUrl;
-        window.generatedImageUrl = data.imageUrl;
-        window.generatedFact = data.fact;
-      } catch (err) {
-        console.error("🐾 画像読み込み失敗:", err);
-        imgEl.alt = "猫画像の取得に失敗しました。";
+        const blob = await res.blob();
+        const objectURL = URL.createObjectURL(blob);
+
+        imgEl.src = objectURL;
+        imgEl.onload = () => {
+          // 🐾 読み込み完了で切り替え
+          loader.style.display = "none";
+          imgEl.style.display = "block";
+        };
+      } catch (error) {
+        console.error("🐾 画像ロードエラー:", error);
+        loader.textContent = "😿 読み込みに失敗しました";
       }
 
       document.getElementById("shareButton").onclick = () => {
-        const fact = window.generatedFact || "";
-        const imageUrl = window.generatedImageUrl || "";
-        const siteUrl = "https://everydaycat.vercel.app/";
-
-        let text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact}\n${imageUrl}\n${siteUrl}\n#猫 #にゃんこ`;
-
-        // ✂️ 280文字を超える場合は自動調整
-        if (text.length > 280) {
-          const excess = text.length - 280;
-          const shortenedFact = fact.slice(0, fact.length - excess - 3) + "…";
-          text = `🐾 今日の #毎日にゃんこ 🐈\n\n${shortenedFact}\n${imageUrl}\n${siteUrl}\n#猫 #にゃんこ`;
-        }
-
-        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        const text = "🐾 今日の #毎日にゃんこ 🐈";
+        const site = "https://everydaycat.vercel.app/";
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
         window.open(tweetUrl, "_blank");
       };
     }
+
     loadCat();
   </script>
 </body>

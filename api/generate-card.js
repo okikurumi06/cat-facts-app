@@ -103,7 +103,7 @@ export default async function handler(req, res) {
     // 右下ロゴ
     ctx.font = "16px 'Noto Color Emoji', 'Noto Sans JP'";
     ctx.fillStyle = "#ffcccc";
-    const logoText = "🐾毎日にゃんこ everydaycat";
+    const logoText = "🐾毎日にゃんこeverydaycat";
     const textWidth = ctx.measureText(logoText).width;
     ctx.fillText(logoText, 600 - textWidth - 20, 590);
 
