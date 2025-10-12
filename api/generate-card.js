@@ -29,9 +29,14 @@ export default async function handler(req, res) {
       .limit(1);
 
     if (existing?.length) {
-      const { fact, image_url } = existing[0];
-      console.log("📦 既存データ再利用:", image_url);
-      return res.json({ imageUrl: image_url, fact });
+      const fact = existing[0].fact;
+      const imageUrl = existing[0].image_url;
+
+      // ✅ OGP対応シェアURLを生成して返す
+      const shareUrl = `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(imageUrl)}&fact=${encodeURIComponent(fact)}`;
+
+      console.log("📦 既存データ再利用:", imageUrl);
+      return res.json({ imageUrl, fact, shareUrl });
     }
 
     // 🐱 猫画像取得
