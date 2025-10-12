@@ -30,10 +30,15 @@ export default async function handler(req, res) {
       .limit(1);
 
     if (existing?.length) {
-      const { fact, image_url, short_id } = existing[0];
-      const shareUrl = `https://everydaycat.vercel.app/api/share/${short_id}`;
-      console.log("📦 既存データ再利用:", image_url);
-      return res.json({ imageUrl: image_url, fact, shareUrl });
+      const fact = existing[0].fact;
+      const imageUrl = existing[0].image_url;
+
+      // ✅ ここで shareUrl を再生成する（新規でも既存でも必ず生成）
+      const shareId = imageUrl.split("/").pop().replace(".png", "");
+      const shareUrl = `https://everydaycat.vercel.app/api/share/${shareId}`;
+
+      console.log("📦 既存データ再利用:", imageUrl);
+      return res.json({ imageUrl, fact, shareUrl });
     }
 
     // 🐱 猫画像取得
