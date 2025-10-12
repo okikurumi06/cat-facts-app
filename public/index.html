@@ -88,7 +88,6 @@
   </div>
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
-
 <script>
   async function loadCat() {
     const imgEl = document.getElementById("catImage");
@@ -96,33 +95,36 @@
     try {
       // 🐾 API呼び出し
       const res = await fetch("/api/generate-card");
+      if (!res.ok) throw new Error("画像生成APIに失敗しました。");
+
       const data = await res.json();
+      console.log("🐾 APIレスポンス:", data);
 
       const imageUrl = data.imageUrl;
       const fact = data.fact || "猫は気まぐれだけど愛らしい動物です🐾";
+      const shareUrl = data.shareUrl || `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(imageUrl)}&fact=${encodeURIComponent(fact)}`;
 
-      // 🖼️ 画像表示
+      // ✅ 画像を表示
       imgEl.src = imageUrl;
 
-      // ✅ 投稿テキスト組み立て（280文字対策）
-      let text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact}\n\n`;
-      text += `${imageUrl}\nhttps://everydaycat.vercel.app/\n#猫 #にゃんこ`;
+      // ✅ 投稿テキスト組み立て
+      let text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact}\n\n${shareUrl}\n#猫 #にゃんこ`;
 
-      // Twitterの文字数上限（280字）を超える場合は短縮
+      // ✅ 文字数制限対応（280文字）
       if (text.length > 280) {
         const allowedFactLength = 280 - (text.length - fact.length) - 3;
-        text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact.slice(0, allowedFactLength)}...\n\n${imageUrl}\nhttps://everydaycat.vercel.app/\n#猫 #にゃんこ`;
+        text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact.slice(0, allowedFactLength)}...\n\n${shareUrl}\n#猫 #にゃんこ`;
       }
 
-      // ✅ シェアボタン設定
+      // ✅ X共有ボタン設定
       document.getElementById("shareButton").onclick = () => {
         const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
         window.open(tweetUrl, "_blank");
       };
 
-    } catch (err) {
-      console.error("🐾 画像取得エラー:", err);
-      imgEl.alt = "猫画像の取得に失敗しました。";
+    } catch (error) {
+      console.error("🐾 画像ロードエラー:", error);
+      imgEl.alt = "猫画像の読み込みに失敗しました。";
     }
   }
 
