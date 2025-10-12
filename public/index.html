@@ -105,12 +105,19 @@
         // 🐱 画像を表示
         imgEl.src = imageUrl;
 
-        // 🧠 X共有ボタンに画像URLも含める（←変更点）
+        // 🧠 X共有ボタン
         document.getElementById("shareButton").onclick = () => {
-          const text = `🐾 今日の #毎日にゃんこ 🐈\n${fact}\n\n${imageUrl}\nhttps://everydaycat.vercel.app/\n#猫 #にゃんこ`;
-          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+          const text = `🐾 今日の #毎日にゃんこ 🐈`;
+          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.shareUrl)}&hashtags=猫,にゃんこ`;
           window.open(tweetUrl, "_blank");
         };
+
+        // 🧠 X共有ボタンに画像URLも含める（←変更点）
+        //document.getElementById("shareButton").onclick = () => {
+        //  const text = `🐾 今日の #毎日にゃんこ 🐈\n${fact}\n\n${imageUrl}\nhttps://everydaycat.vercel.app/\n#猫 #にゃんこ`;
+        //  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        //  window.open(tweetUrl, "_blank");
+        //};
 
       } catch (e) {
         console.error("🐾 猫画像の取得に失敗:", e);

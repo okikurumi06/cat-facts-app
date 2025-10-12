@@ -134,7 +134,13 @@ export default async function handler(req, res) {
       console.log("📝 Supabase upsert success:", upsertData);
     }
 
-    res.json({ imageUrl: publicUrl, fact });
+    // ✅ シェア用OGPページURLを生成
+    const shareUrl = `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(publicUrl)}&fact=${encodeURIComponent(fact)}`;
+   
+    // 🧩 応答内容を変更
+    //res.json({ imageUrl: publicUrl, fact });
+    res.json({ imageUrl: publicUrl, fact, shareUrl });
+
   } catch (err) {
     console.error("🐾 Error in /api/generate-card:", err);
     res.status(500).json({ error: "猫カード生成に失敗しました。" });
