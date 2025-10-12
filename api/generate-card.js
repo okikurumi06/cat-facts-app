@@ -137,9 +137,9 @@ export default async function handler(req, res) {
     // ✅ シェア用OGPページURLを生成
     const shareUrl = `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(publicUrl)}&fact=${encodeURIComponent(fact)}`;
    
-    // 🧩 応答内容を変更
-    //res.json({ imageUrl: publicUrl, fact });
+    // ✅ 応答内容に shareUrl を追加
     res.json({ imageUrl: publicUrl, fact, shareUrl });
+
 
   } catch (err) {
     console.error("🐾 Error in /api/generate-card:", err);
