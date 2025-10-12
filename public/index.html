@@ -154,27 +154,34 @@
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
-      const factEl = document.getElementById("catFact");
-
       try {
         const res = await fetch("/api/generate-card?" + Date.now());
         const data = await res.json();
+        if (!data.imageUrl) throw new Error("画像URLが取得できませんでした");
 
         imgEl.src = data.imageUrl;
-        factEl.textContent = data.fact;
+        window.generatedImageUrl = data.imageUrl;
+        window.generatedFact = data.fact;
 
-        document.getElementById("shareButton").onclick = () => {
-          const text = `🐾 今日の #毎日にゃんこ 🐈\n${data.fact}`;
-          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.imageUrl)}&hashtags=猫,にゃんこ`;
-          window.open(tweetUrl, "_blank");
-        };
+        // 🧠 OGPを動的に更新
+        const ogImg = document.querySelector('meta[property="og:image"]');
+        if (ogImg) ogImg.content = data.imageUrl;
+
       } catch (error) {
-        console.error("🐾 猫情報の読み込みに失敗:", error);
-        factEl.textContent = "猫情報の取得に失敗しました。";
-        imgEl.alt = "画像の読み込みに失敗しました。";
+        console.error("🐾 画像ロードエラー:", error);
+        imgEl.alt = "猫画像の読み込みに失敗しました。";
       }
-    }
 
+      // 🐈 X共有ボタン
+      document.getElementById("shareButton").onclick = () => {
+        const text = `🐾 今日の #毎日にゃんこ 🐈\n\n${window.generatedFact}\n`;
+        const site = "https://everydaycat.vercel.app/";
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
+        window.open(tweetUrl, "_blank");
+      };
+    }
     loadCat();
   </script>
 </body>
