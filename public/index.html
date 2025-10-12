@@ -89,42 +89,35 @@
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
 
-  <script>
+<script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
 
       try {
-        // 🐾 APIを呼び出して猫画像と豆知識を取得
+        // 🐾 API呼び出し
         const res = await fetch("/api/generate-card?" + Date.now());
-        if (!res.ok) throw new Error("API呼び出しに失敗しました");
+        if (!res.ok) throw new Error("画像取得に失敗しました。");
 
         const data = await res.json();
-        const imageUrl = data.imageUrl; // Supabase画像URL
-        const fact = data.fact;
 
-        // 🐱 画像を表示
-        imgEl.src = imageUrl;
+        // 🖼️ Supabase 画像を表示
+        imgEl.src = data.imageUrl;
 
         // 🧠 X共有ボタン
         document.getElementById("shareButton").onclick = () => {
-          const text = `🐾 今日の #毎日にゃんこ 🐈`;
-          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.shareUrl)}&hashtags=猫,にゃんこ`;
+          const text = "🐾 今日の #毎日にゃんこ 🐈";
+          // ✅ APIが返した shareUrl を使用
+          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            text
+          )}&url=${encodeURIComponent(data.shareUrl)}&hashtags=猫,にゃんこ`;
+
           window.open(tweetUrl, "_blank");
         };
-
-        // 🧠 X共有ボタンに画像URLも含める（←変更点）
-        //document.getElementById("shareButton").onclick = () => {
-        //  const text = `🐾 今日の #毎日にゃんこ 🐈\n${fact}\n\n${imageUrl}\nhttps://everydaycat.vercel.app/\n#猫 #にゃんこ`;
-        //  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        //  window.open(tweetUrl, "_blank");
-        //};
-
-      } catch (e) {
-        console.error("🐾 猫画像の取得に失敗:", e);
-        imgEl.alt = "画像の取得に失敗しました。";
+      } catch (error) {
+        console.error("🐾 画像ロードエラー:", error);
+        imgEl.alt = "猫画像の読み込みに失敗しました。";
       }
     }
-
     loadCat();
   </script>
 </body>
