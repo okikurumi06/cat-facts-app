@@ -6,18 +6,17 @@
   <title>毎日にゃんこ everyday cat 🐾</title>
   <meta name="description" content="AIが生成する猫の豆知識を毎日楽しもう！🐱">
 
-  <!-- 🧹 旧everydaycat.vercel.app → cat-facts-app-topaz.vercel.app に変更 -->
-  <!-- OGP情報はそのまま保持 -->
+  <!-- ✅ URLをeverydaycat.vercel.appに変更 -->
   <meta property="og:title" content="毎日にゃんこ - 今日の猫と豆知識" />
   <meta property="og:description" content="AIが生成したかわいい猫画像と豆知識を毎日お届け！🐾" />
-  <meta property="og:image" content="https://cat-facts-app-topaz.vercel.app/api/generate-card" />
-  <meta property="og:url" content="https://cat-facts-app-topaz.vercel.app/" />
+  <meta property="og:image" content="https://everydaycat.vercel.app/api/generate-card" />
+  <meta property="og:url" content="https://everydaycat.vercel.app/" />
   <meta property="og:type" content="website" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="毎日にゃんこ - 今日の猫と豆知識" />
   <meta name="twitter:description" content="AIが生成したかわいい猫画像と豆知識を毎日お届け！🐱" />
-  <meta name="twitter:image" content="https://cat-facts-app-topaz.vercel.app/api/generate-card" />
+  <meta name="twitter:image" content="https://everydaycat.vercel.app/api/generate-card" />
   <meta name="twitter:site" content="@your_twitter_account" />
 
   <link rel="icon" href="/logo.png">
@@ -57,7 +56,6 @@
       max-width: 520px;
       margin: 0 auto;
       padding: 20px;
-      transition: all 0.3s ease;
     }
 
     img {
@@ -95,13 +93,23 @@
       color: #666;
     }
 
+    footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+
+    footer a {
+      color: #bbb;
+      text-decoration: none;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 1rem;
       }
       h1 {
         font-size: 1.4rem;
-        margin-bottom: 1rem;
       }
       .logo {
         width: 120px;
@@ -130,7 +138,6 @@
 
   <div class="card">
     <img id="catImage" src="" alt="猫の画像">
-    <!-- 🐾 追加: 豆知識を表示する要素 -->
     <p id="catFact" class="fact"></p>
     <div>
       <button id="shareButton">🐈 Xでシェアする</button>
@@ -139,27 +146,28 @@
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
 
+  <!-- 👤 控えめな作成者表記を追加 -->
+  <footer>
+    Created by <a href="https://github.com/okikurumi06" target="_blank">okikurumi</a>
+  </footer>
+
   <script>
     async function loadCat() {
       const imgEl = document.getElementById("catImage");
       const factEl = document.getElementById("catFact");
 
       try {
-        // ✅ JSONデータを取得（以前はBlobだったが、現在は{fact, imageUrl}）
-        const response = await fetch("/api/generate-card?" + Date.now());
-        const data = await response.json();
+        const res = await fetch("/api/generate-card?" + Date.now());
+        const data = await res.json();
 
-        // ✅ 生成画像URLと豆知識を反映
         imgEl.src = data.imageUrl;
         factEl.textContent = data.fact;
 
-        // ✅ X共有ボタン更新
         document.getElementById("shareButton").onclick = () => {
           const text = `🐾 今日の #毎日にゃんこ 🐈\n${data.fact}`;
           const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.imageUrl)}&hashtags=猫,にゃんこ`;
           window.open(tweetUrl, "_blank");
         };
-
       } catch (error) {
         console.error("🐾 猫情報の読み込みに失敗:", error);
         factEl.textContent = "猫情報の取得に失敗しました。";
