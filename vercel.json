@@ -5,6 +5,7 @@
     { "src": "index.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/share/(.*)", "dest": "/api/share/[id].js" },
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/(.*)", "dest": "/index.js" }
   ]
