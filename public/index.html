@@ -150,35 +150,38 @@
   <footer>
     Created by <a href="https://github.com/okikurumi06" target="_blank">okikurumi</a>
   </footer>
-
   <script>
     async function loadCat() {
+      // 👤 ローカルユーザーIDを保持（ブラウザごとに異なる）
+      let userId = localStorage.getItem("userId");
+      if (!userId) {
+        userId = "user-" + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem("userId", userId);
+      }
+
       const imgEl = document.getElementById("catImage");
+
       try {
-        const res = await fetch("/api/generate-card?" + Date.now());
+        // 🐾 API呼び出し（ユーザーID付き）
+        const res = await fetch(`/api/generate-card?user=${userId}`);
         const data = await res.json();
         if (!data.imageUrl) throw new Error("画像URLが取得できませんでした");
 
         imgEl.src = data.imageUrl;
         window.generatedImageUrl = data.imageUrl;
         window.generatedFact = data.fact;
-
-        // 🧠 OGPを動的に更新
-        const ogImg = document.querySelector('meta[property="og:image"]');
-        if (ogImg) ogImg.content = data.imageUrl;
-
-      } catch (error) {
-        console.error("🐾 画像ロードエラー:", error);
-        imgEl.alt = "猫画像の読み込みに失敗しました。";
+      } catch (err) {
+        console.error("🐾 画像読み込み失敗:", err);
+        imgEl.alt = "猫画像の取得に失敗しました。";
       }
 
       // 🐈 X共有ボタン
       document.getElementById("shareButton").onclick = () => {
         const text = `🐾 今日の #毎日にゃんこ 🐈\n\n${window.generatedFact}\n`;
-        const site = "https://everydaycat.vercel.app/";
+        const url = window.generatedImageUrl;
         const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
           text
-        )}&url=${encodeURIComponent(site)}&hashtags=猫,にゃんこ`;
+        )}&url=${encodeURIComponent(url)}&hashtags=猫,にゃんこ`;
         window.open(tweetUrl, "_blank");
       };
     }
