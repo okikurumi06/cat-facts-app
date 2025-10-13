@@ -29,17 +29,23 @@
       text-align: center;
       margin: 0;
       padding: 1.5rem;
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 60px; /* フッター分の余白 */
     }
+
     .logo {
       width: 140px;
       margin: 0 auto 10px;
       display: block;
     }
+
     h1 {
       font-size: 1.8rem;
       color: #ff8888;
       margin-bottom: 1.2rem;
     }
+
     .card {
       background: white;
       border-radius: 16px;
@@ -48,12 +54,14 @@
       margin: 0 auto;
       padding: 20px;
     }
+
     img {
       border-radius: 12px;
       width: 100%;
       height: auto;
       margin-bottom: 1rem;
     }
+
     button {
       background: #1DA1F2;
       border: none;
@@ -66,19 +74,58 @@
       width: 100%;
       max-width: 260px;
     }
+
     button:hover {
       background: #0d8de1;
     }
+
     .note {
       margin-top: 1rem;
       font-size: 0.85rem;
       color: #666;
+    }
+
+    /* 🐾 ローディングアニメーション */
+    #loading {
+      display: none;
+      font-size: 1.5rem;
+      color: #ff8888;
+      animation: pawsteps 1s infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes pawsteps {
+      0% { opacity: 0.3; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-5px); }
+      100% { opacity: 0.3; transform: translateY(0); }
+    }
+
+    /* フッター（控えめ表示） */
+    footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      font-size: 0.75rem;
+      color: #aaa;
+      text-align: center;
+    }
+
+    footer a {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <img src="/logo.png" alt="毎日にゃんこ" class="logo">
   <h1>🐾 毎日にゃんこ everyday cat 🐾</h1>
+
+  <div id="loading">🐾 読み込み中...</div>
 
   <div class="card">
     <img id="catImage" src="" alt="猫の画像">
@@ -88,53 +135,53 @@
   </div>
 
   <p class="note">※AIが生成した豆知識のため正確でない可能性があります。</p>
-  
+
   <footer>
     Created by <a href="https://github.com/okikurumi06" target="_blank">okikurumi</a>
   </footer>
 
-<script>
-  async function loadCat() {
-    const imgEl = document.getElementById("catImage");
+  <script>
+    async function loadCat() {
+      const imgEl = document.getElementById("catImage");
+      const loading = document.getElementById("loading");
 
-    try {
-      // 🐾 API呼び出し
-      const res = await fetch("/api/generate-card");
-      if (!res.ok) throw new Error("画像生成APIに失敗しました。");
+      try {
+        loading.style.display = "block"; // 🐾 ローディング開始
 
-      const data = await res.json();
-      console.log("🐾 APIレスポンス:", data);
+        const res = await fetch("/api/generate-card");
+        if (!res.ok) throw new Error("画像生成APIに失敗しました。");
 
-      const imageUrl = data.imageUrl;
-      const fact = data.fact || "猫は気まぐれだけど愛らしい動物です🐾";
-      const shareUrl = data.shareUrl || `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(imageUrl)}&fact=${encodeURIComponent(fact)}`;
+        const data = await res.json();
+        console.log("🐾 APIレスポンス:", data);
 
-      // ✅ 画像を表示
-      imgEl.src = imageUrl;
+        const imageUrl = data.imageUrl;
+        const fact = data.fact || "猫は気まぐれだけど愛らしい動物です🐾";
+        const shareUrl = data.shareUrl || `https://everydaycat.vercel.app/api/share?img=${encodeURIComponent(imageUrl)}&fact=${encodeURIComponent(fact)}`;
 
-      // ✅ 投稿テキスト組み立て
-      let text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact}\n\n${shareUrl}\n#猫 #にゃんこ`;
+        imgEl.src = imageUrl;
 
-      // ✅ 文字数制限対応（280文字）
-      if (text.length > 280) {
-        const allowedFactLength = 280 - (text.length - fact.length) - 3;
-        text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact.slice(0, allowedFactLength)}...\n\n${shareUrl}\n#猫 #にゃんこ`;
+        let text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact}\n\n${shareUrl}\n#猫 #にゃんこ`;
+
+        if (text.length > 280) {
+          const allowedFactLength = 280 - (text.length - fact.length) - 3;
+          text = `🐾 今日の #毎日にゃんこ 🐈\n\n${fact.slice(0, allowedFactLength)}...\n\n${shareUrl}\n#猫 #にゃんこ`;
+        }
+
+        document.getElementById("shareButton").onclick = () => {
+          const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+          window.open(tweetUrl, "_blank");
+        };
+
+      } catch (error) {
+        console.error("🐾 画像ロードエラー:", error);
+        imgEl.alt = "猫画像の読み込みに失敗しました。";
+      } finally {
+        loading.style.display = "none"; // ✅ ローディング終了
       }
-
-      // ✅ X共有ボタン設定
-      document.getElementById("shareButton").onclick = () => {
-        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        window.open(tweetUrl, "_blank");
-      };
-
-    } catch (error) {
-      console.error("🐾 画像ロードエラー:", error);
-      imgEl.alt = "猫画像の読み込みに失敗しました。";
     }
-  }
 
-  loadCat();
-</script>
+    loadCat();
+  </script>
 
 </body>
 </html>
